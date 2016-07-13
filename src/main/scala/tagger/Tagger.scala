@@ -90,18 +90,16 @@ class Tagger(trainingCorpus: TaggedCorpus = GeneTrainingCorpus,
       yield getSentenceTags(sent.toList)
   }
 
-  def writeDocumentTags(doc: Document, filename: String): Unit = {
-    // TODO: method should take an output document formatter along with filename?
+  def writeDocumentTags(doc: Document, outFile: File): Unit = {
+    // TODO: method should take an output document formatter along with outFile?
     try {
-      try {
-        val writer = new BufferedWriter(new FileWriter(new File(filename)))
-        getDocumentTags(doc).foreach{ sentIter =>
-          writer.write(sentIter.map(t => s"${t.word}|${t.word}").mkString(" ") + "\n")
-        }
-        writer.close()
-      } catch {
-        case e: IOException => println(s"IOException processing file $filename")
+      val writer = new BufferedWriter(new FileWriter(outFile))
+      getDocumentTags(doc).foreach{ sentIter =>
+        writer.write(sentIter.map(t => s"${t.word}|${t.word}").mkString(" ") + "\n")
       }
+      writer.close()
+    } catch {
+      case e: IOException => println(s"IOException processing file ${outFile.getName}")
     }
   }
 

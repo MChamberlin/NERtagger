@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/nertagger.iml" filepath="$PROJECT_DIR$/.idea/modules/nertagger.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/nertagger-build.iml" filepath="$PROJECT_DIR$/.idea/modules/nertagger-build.iml" />
+    </modules>
+  </component>
+</project>

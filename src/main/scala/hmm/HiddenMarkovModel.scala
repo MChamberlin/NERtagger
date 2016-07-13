@@ -86,21 +86,21 @@ class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {
 
   // load helper methods
 
-  private def processNGramRule(args: List[String]): Unit = {
+  private def parseNGramRule(args: List[String]): Unit = {
     val (count, ngram) = args.splitAt(1)
     ngramCounts(ngram.length-1).update(ngram, count(0).toInt)
   }
 
-  private def processTagTupleRule(args: List[String]): Unit = {
+  private def parseTagTupleRule(args: List[String]): Unit = {
     emissCounts.update(new TagTuple(args(1),args(2)), args(0).toInt)
   }
 
-  private def processRule(line: String): Unit = {
+  private def parseRule(line: String): Unit = {
     try {
       val (_type, args) = line.split(" ").toList.splitAt(1)
       _type(0) match {
-        case "TAGTUPLE" => processTagTupleRule(args)
-        case "N-GRAM" => processNGramRule(args)
+        case "TAGTUPLE" => parseTagTupleRule(args)
+        case "N-GRAM" => parseNGramRule(args)
       }
     } catch {
       case e: Any => println(s"Error: Badly formed rule: $line")
@@ -112,7 +112,7 @@ class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {
       wordSet.clear()
       symbSet.clear()
       val source = Source.fromFile(filename)
-      source.getLines().foreach(l => processRule(l))
+      source.getLines().foreach(l => parseRule(l))
       wordSet ++= emissCounts.keySet.map(x=>x.word).toSet
       symbSet ++= ngramCounts(0).keySet.flatMap(x=>x)
     } catch {

@@ -12,6 +12,13 @@ protected class SymbTypeCounter {
   var falsePos: Int = 0
   var falseNeg: Int = 0
 
+  def reset: Unit = {
+    truePos = 0
+    trueNeg = 0
+    falsePos = 0
+    falseNeg = 0
+  }
+
   def getPrecision: Double = {
     truePos / (truePos + falsePos).toDouble
   }
@@ -45,6 +52,7 @@ class TaggerEvaluator(tagger: Tagger) {
   val totalCounter = new SymbTypeCounter
 
   def collectCounts(devDoc: Document, keyDoc: TaggedCorpus): Unit = {
+    totalCounter.reset
     devDoc.getSentIter.zip(keyDoc.getSentIter).foreach{ case (sent, trueTags) =>
       tagger.getSentenceTags(sent.toList).zip(trueTags.toList).foreach{ case (predTag,trueTag) =>
         // TODO: handle multiple classes using the SymbTypeCounts class

@@ -13,7 +13,7 @@ object GeneDev extends Document {
 
   def getSentIter: SentIter = {
     for (line <- source.reset().getLines() if line.trim.nonEmpty)
-    yield line.split(" ").toIterator
+      yield line.split(" ").toIterator
   }
 
 }

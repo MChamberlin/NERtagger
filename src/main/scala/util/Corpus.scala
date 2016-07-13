@@ -20,7 +20,7 @@ class BarSepTagCorpus extends TaggedCorpus {
   // TODO: wrap in try/catch block or figure out how to deal with `source`
   def getSentIter: TaggedSentIter = {
     val source = Source.fromFile(filename)
-    for (line <- source.reset.getLines if line.trim.nonEmpty)
+    for (line <- source.reset().getLines() if line.trim.nonEmpty)
       yield pattern.findAllMatchIn(line).map( m => TagTuple(m.group("word"),m.group("symb")) )
   }
 }

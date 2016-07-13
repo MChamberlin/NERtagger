@@ -12,7 +12,7 @@ object GeneDev extends Document {
   val source = Source.fromFile(filename)
 
   def getSentIter: SentIter = {
-    for (line <- source.reset.getLines if line.trim.nonEmpty)
+    for (line <- source.reset().getLines() if line.trim.nonEmpty)
     yield line.split(" ").toIterator
   }
 

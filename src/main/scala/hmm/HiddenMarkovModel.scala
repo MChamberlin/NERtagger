@@ -78,7 +78,7 @@ class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {
       emissCounts.toIterator.foreach { case (tt, count) =>
         writer.write(s"TAGTUPLE $count ${tt.word} ${tt.symb}\n")
       }
-      ngramCounts.flatMap(x=>x).foreach { case (ngram,count) =>
+      ngramCounts.flatMap(x=>x).foreach { case (ngram, count) =>
         writer.write(s"N-GRAM $count ${ngram.mkString(" ")}\n")
       }
       writer.close()
@@ -113,10 +113,10 @@ class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {
 
   def load(filename: String): Unit = {
     try {
-      wordSet.clear
-      symbSet.clear
+      wordSet.clear()
+      symbSet.clear()
       val source = Source.fromFile(filename)
-      source.getLines.foreach(l => processRule(l))
+      source.getLines().foreach(l => processRule(l))
       wordSet ++= emissCounts.keySet.map(x=>x.word).toSet
       symbSet ++= ngramCounts(0).keySet.flatMap(x=>x)
     } catch {

@@ -14,10 +14,6 @@ class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {
   val wordSet = new HashSet[String]()
   val symbSet = new HashSet[String]()
 
-  def trainGenes(): Unit = {
-    getClass.getResourceAsStream("/genetag.train.txt")
-  }
-
   def train(corpus: TaggedCorpus, rareThreshold: Int = 3) {
     wordSet ++= collectNonRares(corpus.getSentIter, rareThreshold)
     collectFreqs(corpus.getSentIter)

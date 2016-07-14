@@ -46,11 +46,12 @@ object TaggerDriver extends App {
 
     opt[String]('p', "pp").optional().valueName("<str>").
       validate( x =>
-      if (x == "pattern" | x == "replace") success
-      else failure("Preprocessor must be one of {pattern|replace}")).
+        if (Set("pattern","replace","classify").contains(x)) success
+        else failure("Preprocessor must be one of {pattern|replace}")).
       action( (x, c) => x match {
       case "pattern" => c.copy(preprocessor = PatternPreprocessor)
-      case "replace" => c.copy(preprocessor = ReplacePreprocessor)}).
+      case "replace" => c.copy(preprocessor = ReplacePreprocessor)
+      case "classify" => c.copy(preprocessor = ClassifyPreprocessor)}).
       text("Rare word preprocessor; must be one of {pattern|replace}")
 
     cmd("score").action( (_, c) => c.copy(mode = "score") ).

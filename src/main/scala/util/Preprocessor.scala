@@ -32,8 +32,15 @@ object ReplacePreprocessor extends Preprocessor {
 
 object ClassifyPreprocessor extends Preprocessor {
   def transform(word: String): String = {
-    // TODO: IMPLEMENT
-    "<RARE>"
+    if ("[0-9]".r.findFirstIn(word).nonEmpty) {
+      "<NUMERIC>"
+    } else if ("^[A-Z]+$".r.findFirstIn(word).nonEmpty) {
+      "<ALL_CAP>"
+    } else if ("^[A-Z]".r.findFirstIn(word).nonEmpty) {
+      "<FIRST_CAP>"
+    } else {
+      "<RARE>"
+    }
   }
 }
 

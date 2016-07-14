@@ -14,8 +14,10 @@ object TaggerDriver extends App {
                     mode: String = "score",
                     text: String = "")
 
-  val parser = new OptionParser[Config]("NERTagger") {
+  val parser = new OptionParser[Config]("NERtagger") {
     head("NER Tagger", "1.0")
+
+    help("help").text("ouptut usage information")
 
     opt[String]('c', "corpus").optional().valueName("<str>").
       validate( x =>
@@ -74,6 +76,8 @@ object TaggerDriver extends App {
           text("output file name")
       ).text("Saves model rule counts to file for quicker loading")
 
+    // TODO: add ability to tag entire input document
+    // TODO: check config status for either input doc or text
     cmd("tag").action( (_, c) => c.copy(mode = "tag") ).
       children(
         arg[String]("<text>").required().
@@ -117,7 +121,7 @@ object TaggerDriver extends App {
       if (config.outFile.nonEmpty) {
         tagger.writeTags(Iterator(tags), config.outFile.get)
       } else {
-        print(BarSepDocFormatter.formatSentenceTags(tags))
+        print("\nOutput:\n" + BarSepDocFormatter.formatSentenceTags(tags))
       }
     }
   } getOrElse {

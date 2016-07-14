@@ -9,7 +9,7 @@ abstract class Document {
   def getSentIter: SentIter = {
     val source = Source.fromInputStream(getClass.getResourceAsStream(filename))
     for (line <- source.reset().getLines() if line.trim.nonEmpty)
-    yield line.split(" ").toIterator
+      yield line.split(" ").toIterator
   }
 }
 

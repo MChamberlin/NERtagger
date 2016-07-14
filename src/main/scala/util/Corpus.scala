@@ -19,7 +19,7 @@ abstract class PatternCorpus extends TaggedCorpus {
   def getSentIter: TaggedSentIter = {
     val source = Source.fromInputStream(getClass.getResourceAsStream(filename))
     for (line <- source.reset().getLines() if line.trim.nonEmpty)
-    yield pattern.findAllMatchIn(line).map( m => TagTuple(m.group("word"),m.group("symb")) )
+      yield pattern.findAllMatchIn(line).map( m => TagTuple(m.group("word"),m.group("symb")) )
   }
 }
 

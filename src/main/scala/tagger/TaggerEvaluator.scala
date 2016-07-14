@@ -51,7 +51,7 @@ class TaggerEvaluator(tagger: Tagger) {
 
   private def collectCounts(devDoc: Document, keyDoc: TaggedCorpus): Unit = {
     // TODO: allow counting while writing tags so inference is done only once
-    // TODO: handle multiple classes using the SymbTypeCounts class
+    // TODO: handle scoring individual classes using the SymbTypeCounts class
     totalCounter.reset()
     devDoc.getSentIter.zip(keyDoc.getSentIter).foreach{ case (sent, trueTags) =>
       tagger.getSentenceTags(sent.toList).zip(trueTags.toList).foreach{ case (predTag,trueTag) =>
@@ -77,7 +77,7 @@ class TaggerEvaluator(tagger: Tagger) {
 
   def score(devDoc: Document, keyDoc: TaggedCorpus): Unit = {
     collectCounts(devDoc, keyDoc)
-    println("Total Scores")
+    println("\nTotal Scores")
     println("-"*18)
     totalCounter.printScores()
   }

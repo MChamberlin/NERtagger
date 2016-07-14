@@ -19,7 +19,7 @@ class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {
     collectFreqs(corpus.getSentIter)
   }
 
-  def collectFreqs(sentences: TaggedSentIter): Unit = {
+  private def collectFreqs(sentences: TaggedSentIter): Unit = {
     for (sent <- sentences) {
       val wordTuples = sent.map{t => preprocessTagForRares(t)}.toList
       // update emission and 1-gram counts
@@ -39,21 +39,19 @@ class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {
     symbSet ++= ngramCounts(0).keySet.flatMap(x=>x)
   }
 
-  def collectNonRares(sentences: TaggedSentIter, rareThreshold: Int): Set[String] = {
+  private def collectNonRares(sentences: TaggedSentIter, rareThreshold: Int): Set[String] = {
     val wordCounts = new HashMap[String, Int]().withDefaultValue(0)
     sentences.foreach(s => s.foreach(t => wordCounts(t.word)+=1))
     wordCounts.retain((k,v) => v >= rareThreshold).keySet.toSet
   }
 
-  def preprocessTagForRares(t: TagTuple): TagTuple = {
+  private def preprocessTagForRares(t: TagTuple): TagTuple = {
     if (wordSet(t.word)) t else TagTuple(pp.transform(t.word), t.symb)
   }
 
-  def preprocessStrForRares(word: String): String = {
+  private def preprocessStrForRares(word: String): String = {
     if (wordSet(word)) word else pp.transform(word)
   }
-
-  // PUBLIC methods
 
   def getEmissProb(word: String, symb: String): Double = {
     val wordCount = emissCounts(TagTuple(preprocessStrForRares(word),symb))

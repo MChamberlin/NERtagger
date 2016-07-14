@@ -12,10 +12,10 @@ class Tagger(trainingCorpus: TaggedCorpus,
              rareThreshold: Int = 5,
              maxNGramSize: Int = 3,
              preprocessor: Preprocessor = PatternPreprocessor) {
-  val model = new HiddenMarkovModel(maxNGramSize, preprocessor)
+  protected val model = new HiddenMarkovModel(maxNGramSize, preprocessor)
   model.train(trainingCorpus, rareThreshold)
 
-  def viterbi(tokens: List[String]): List[String] = {
+  protected def viterbi(tokens: List[String]): List[String] = {
     // TODO: comment; more informative variable names?
     // initialize probabilities and back-pointer maps
     val bp = HashMap.empty[Int,HashMap[String,HashMap[String,String]]]

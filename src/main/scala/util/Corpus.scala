@@ -13,7 +13,7 @@ abstract class TaggedCorpus {
 }
 
 abstract class BarSepTagCorpus extends TaggedCorpus {
-  val pattern = new Regex("""([^\s\|]+)\|([^\s\|]+)""", "word", "symb")
+  private val pattern = new Regex("""([^\s\|]+)\|([^\s\|]+)""", "word", "symb")
   val filename: String
   val source: Source
 

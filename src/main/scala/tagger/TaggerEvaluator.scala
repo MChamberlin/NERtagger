@@ -51,7 +51,7 @@ protected class SymbTypeCounter {
 class TaggerEvaluator(tagger: Tagger) {
   val totalCounter = new SymbTypeCounter
 
-  def collectCounts(devDoc: Document, keyDoc: TaggedCorpus): Unit = {
+  private def collectCounts(devDoc: Document, keyDoc: TaggedCorpus): Unit = {
     // TODO: allow counting while writing tags so inference is done only once
     totalCounter.reset()
     devDoc.getSentIter.zip(keyDoc.getSentIter).foreach{ case (sent, trueTags) =>

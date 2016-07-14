@@ -45,6 +45,15 @@ object TaggerDriver extends App {
         else failure(s"Only n = 3 supported currently")).
       text("max n-gram size")
 
+    opt[String]('p', "pp").optional().valueName("<str>").
+      validate( x =>
+      if (x == "pattern" | x == "replace") success
+      else failure("Preprocessor must be one of {pattern|replace}")).
+      action( (x, c) => x match {
+      case "pattern" => c.copy(preprocessor = PatternPreprocessor)
+      case "replace" => c.copy(preprocessor = ReplacePreprocessor)}).
+      text("Rare word preprocessor; must be one of {pattern|replace}")
+
   }
 
   // parser.parse returns Option[C]

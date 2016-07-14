@@ -1,7 +1,5 @@
 package util
 
-import java.io.{File, FileInputStream, IOException, FileNotFoundException}
-
 import scala.io.Source
 import scala.util.matching.Regex
 import scala.collection.mutable.HashSet
@@ -11,6 +9,7 @@ abstract class TaggedCorpus {
   val posSymbSet: HashSet[String]
   def getSentIter: TaggedSentIter
 }
+
 
 abstract class PatternCorpus extends TaggedCorpus {
   val filename: String
@@ -37,7 +36,6 @@ object GeneTrainingCorpus extends GeneCorpus {
 object GeneKey extends GeneCorpus {
   val filename = "/genetag.key.txt"
 }
-
 
 
 abstract class WikiCorpus extends PatternCorpus {

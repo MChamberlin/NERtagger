@@ -1,7 +1,5 @@
 package util
 
-import scala.util.matching.Regex
-
 abstract class Preprocessor {
   def transform(word: String): String
 }

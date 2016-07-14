@@ -2,8 +2,6 @@ package tagger
 
 import util._
 
-import scala.collection.mutable.HashMap
-
 
 protected class SymbTypeCounter {
   // TODO: deal with potential DivideByZero errors
@@ -40,10 +38,10 @@ protected class SymbTypeCounter {
   }
 
   def printScores(): Unit = {
-    println(s"Accuracy  | $getAccuracy")
-    println(s"Precision | $getPrecision")
-    println(s"Recall    | $getRecall")
-    println(s"F1-Score  | $getF1Score")
+    println(f"Accuracy  | $getAccuracy%.4f")
+    println(f"Precision | $getPrecision%.4f")
+    println(f"Recall    | $getRecall%.4f")
+    println(f"F1-Score  | $getF1Score%.4f")
   }
 
 }
@@ -53,10 +51,10 @@ class TaggerEvaluator(tagger: Tagger) {
 
   private def collectCounts(devDoc: Document, keyDoc: TaggedCorpus): Unit = {
     // TODO: allow counting while writing tags so inference is done only once
+    // TODO: handle multiple classes using the SymbTypeCounts class
     totalCounter.reset()
     devDoc.getSentIter.zip(keyDoc.getSentIter).foreach{ case (sent, trueTags) =>
       tagger.getSentenceTags(sent.toList).zip(trueTags.toList).foreach{ case (predTag,trueTag) =>
-        // TODO: handle multiple classes using the SymbTypeCounts class
         if (predTag.word != trueTag.word) {
           println(s"ERROR: word mismatch (${predTag.word} != ${trueTag.word})")
         }
@@ -79,6 +77,8 @@ class TaggerEvaluator(tagger: Tagger) {
 
   def score(devDoc: Document, keyDoc: TaggedCorpus): Unit = {
     collectCounts(devDoc, keyDoc)
+    println("Total Scores")
+    println("-"*18)
     totalCounter.printScores()
   }
 

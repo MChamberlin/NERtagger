@@ -37,14 +37,13 @@ object ClassifyPreprocessor extends Preprocessor {
   }
 }
 
-// UNUSED
 
-abstract class DocumentFormatter {
-  def formatSentenceTags(sent: List[TagTuple]): String
+abstract class DocFormatter {
+  def formatSentenceTags(sent: TagIter): String
 }
 
-object BarSepDocumentFormatter extends DocumentFormatter {
-  def formatSentenceTags(sent: List[TagTuple]): String = {
-    sent.map(t => s"${t.word}|${t.word}").mkString(" ")
+object BarSepDocFormatter extends DocFormatter {
+  def formatSentenceTags(sent: TagIter): String = {
+    sent.map(t => s"${t.word}|${t.symb}").mkString(" ") + "\n"
   }
 }

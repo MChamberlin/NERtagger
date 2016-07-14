@@ -54,7 +54,7 @@ class TaggerEvaluator(tagger: Tagger) {
     // TODO: handle scoring individual classes using the SymbTypeCounts class
     totalCounter.reset()
     devDoc.getSentIter.zip(keyDoc.getSentIter).foreach{ case (sent, trueTags) =>
-      tagger.getSentenceTags(sent.toList).zip(trueTags.toList).foreach{ case (predTag,trueTag) =>
+      tagger.getSentenceTags(sent.toList).zip(trueTags).foreach{ case (predTag,trueTag) =>
         if (predTag.word != trueTag.word) {
           println(s"ERROR: word mismatch (${predTag.word} != ${trueTag.word})")
         }

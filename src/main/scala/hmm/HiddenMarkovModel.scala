@@ -66,9 +66,9 @@ class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {
     tgramCount.toDouble / bgramCount
   }
 
-  def save(filename: String): Unit = {
+  def save(file: File): Unit = {
     try {
-      val writer = new BufferedWriter(new FileWriter(new File(filename)))
+      val writer = new BufferedWriter(new FileWriter(file))
       emissCounts.toIterator.foreach { case (tt, count) =>
         writer.write(s"TAGTUPLE $count ${tt.word} ${tt.symb}\n")
       }
@@ -77,12 +77,13 @@ class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {
       }
       writer.close()
     } catch {
-      case e: FileNotFoundException => println(s"Could not find file $filename")
-      case e: IOException => println(s"IOException processing file $filename")
+      case e: FileNotFoundException => println(s"Could not find file ${file.getName}")
+      case e: IOException => println(s"IOException processing file ${file.getName}")
     }
   }
 
   // load helper methods
+  // TODO: push rule file logic into seperate class similar to Corpus
 
   private def parseNGramRule(args: List[String]): Unit = {
     val (count, ngram) = args.splitAt(1)
@@ -105,17 +106,15 @@ class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {
     }
   }
 
-  def load(filename: String): Unit = {
+  def load(source: Source): Unit = {
     try {
       wordSet.clear()
       symbSet.clear()
-      val source = Source.fromFile(filename)
       source.getLines().foreach(l => parseRule(l))
       wordSet ++= emissCounts.keySet.map(x=>x.word).toSet
       symbSet ++= ngramCounts(0).keySet.flatMap(x=>x)
     } catch {
-      case e: FileNotFoundException => println(s"Could not find file $filename")
-      case e: IOException => println(s"IOException processing file $filename")
+      case e: IOException => println(s"IOException processing source ${source}")
     }
   }
 

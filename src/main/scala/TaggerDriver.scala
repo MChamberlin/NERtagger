@@ -5,22 +5,17 @@ import tagger.{TaggerEvaluator, Tagger}
 import util._
 
 object TaggerDriver extends App {
-  // TODO: add commands to train, score, and tag separately using train/dev/key args
-  case class Config(outFile: File = new File("."),
+  // TODO: add allow loading of rule counts
+  case class Config(outFile: Option[File] = None,
                     docSet: DocSet = WikiDocSet,
                     rareThreshold: Int = 5,
                     maxNGramSize: Int = 3,
-                    preprocessor: Preprocessor = PatternPreprocessor)
+                    preprocessor: Preprocessor = PatternPreprocessor,
+                    mode: String = "score",
+                    text: String = "")
 
   val parser = new OptionParser[Config]("NERTagger") {
     head("NER Tagger", "1.0")
-
-    opt[File]('o', "out").required().valueName("<file>").
-      action( (x, c) => c.copy(outFile = x) ).
-      validate( x =>
-        if (x.canWrite) success
-        else failure(s"${x.getPath} is not writeable")).
-      text("output file name")
 
     opt[String]('c', "corpus").optional().valueName("<str>").
       validate( x =>
@@ -54,18 +49,72 @@ object TaggerDriver extends App {
       case "replace" => c.copy(preprocessor = ReplacePreprocessor)}).
       text("Rare word preprocessor; must be one of {pattern|replace}")
 
+    cmd("score").action( (_, c) => c.copy(mode = "score") ).
+      children(
+        opt[File]('o', "out").optional().valueName("<file>").
+          action( (x, c) => c.copy(outFile = Some(x)) ).
+          validate( x =>
+            if (x.canWrite) success
+            else failure(s"${x.getPath} is not writeable")).
+          text("output file name (optional)")
+      ).text("Scores tagger on dev/key set and outputs tagged development set to file if provided.")
+
+    cmd("save").action( (_, c) => c.copy(mode = "save") ).
+      children(
+        opt[File]('o', "out").required().valueName("<file>").
+          action( (x, c) => c.copy(outFile = Some(x)) ).
+          validate( x =>
+            if (x.canWrite) success
+            else failure(s"${x.getPath} is not writeable")).
+          text("output file name")
+      ).text("Saves model rule counts to file for quicker loading")
+
+    cmd("tag").action( (_, c) => c.copy(mode = "tag") ).
+      children(
+        arg[String]("<text>").required().
+          action( (x, c) => c.copy(text = x)).
+          validate( x =>
+            if (x.nonEmpty) success
+            else failure("<text> must be non-empty")
+          ).text("text to tag"),
+        opt[File]('o', "out").optional().valueName("<file>").
+          action( (x, c) => c.copy(outFile = Some(x)) ).
+          validate( x =>
+            if (x.canWrite) success
+            else failure(s"${x.getPath} is not writeable")).
+          text("output file name (optional)")
+//        opt[File]('l', "load").optional().valueName("<file>").
+//          action( (x, c) => c.copy(loadFile = Some(x))).
+//          validate( x =>
+//            if (x.canRead) success
+//            else failure(s"${x.getPath} is not readable")).
+//          text("load file name")
+      ).text("Tag sentence using trained model; output to file if provided")
   }
 
-  // parser.parse returns Option[C]
   parser.parse(args, Config()).map { config =>
     val tagger = new Tagger(config.rareThreshold, config.maxNGramSize, config.preprocessor)
-    println(s"Training tagger...")
+    println("Training tagger...")
     tagger.train(config.docSet.corpus)
-    println(s"Writing tagged sentences...")
-    tagger.writeDocumentTags(config.docSet.devDoc, config.outFile)
-    println(s"Tagged sentences written to ${config.outFile.getName}")
-    val scorer = new TaggerEvaluator(tagger)
-    scorer.score(config.docSet.devDoc, config.docSet.keyDoc)
+    if (config.mode == "score") {
+      if (config.outFile.nonEmpty) {
+        println(s"Writing tagged sentences...")
+        tagger.writeDocumentTags(config.docSet.devDoc, config.outFile.get)
+        println(s"Tagged sentences written to ${config.outFile.get.getName}")
+      }
+      println("Scoring tagger...")
+      val scorer = new TaggerEvaluator(tagger)
+      scorer.score(config.docSet.devDoc, config.docSet.keyDoc)
+    } else if (config.mode == "save") {
+      tagger.model.save(config.outFile.get)
+    } else if (config.mode == "tag") {
+      val tags = tagger.getSentenceTags(config.text.split(" ").toList)
+      if (config.outFile.nonEmpty) {
+        tagger.writeTags(Iterator(tags), config.outFile.get)
+      } else {
+        print(BarSepDocFormatter.formatSentenceTags(tags))
+      }
+    }
   } getOrElse {
     // arguments are bad, usage message will have been displayed
   }

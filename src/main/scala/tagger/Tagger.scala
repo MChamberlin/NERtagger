@@ -82,26 +82,29 @@ class Tagger(rareThreshold: Int = 5,
     tags.toList.drop(1)
   }
 
-  def getSentenceTags(sent: List[String]): List[TagTuple] = {
-    viterbi(sent).zip(sent).map{case (symb, word) => new TagTuple(word,symb)}
+  def getSentenceTags(sent: List[String]): TagIter = {
+    viterbi(sent).zip(sent).map{case (symb, word) => new TagTuple(word,symb)}.toIterator
   }
 
-  def getDocumentTags(doc: Document): Iterator[List[TagTuple]] = {
+  def getDocumentTags(doc: Document): TaggedSentIter = {
     for (sent <- doc.getSentIter)
       yield getSentenceTags(sent.toList)
   }
 
-  def writeDocumentTags(doc: Document, outFile: File): Unit = {
-    // TODO: method should take an output document formatter along with outFile?
+  def writeTags(sentIter: TaggedSentIter, outFile: File, fmtr: DocFormatter = BarSepDocFormatter): Unit = {
     try {
       val writer = new BufferedWriter(new FileWriter(outFile))
-      getDocumentTags(doc).foreach{ sentIter =>
-        writer.write(sentIter.map(t => s"${t.word}|${t.symb}").mkString(" ") + "\n")
+      sentIter.foreach{ tagIter =>
+        writer.write(fmtr.formatSentenceTags(tagIter))
       }
       writer.close()
     } catch {
       case e: IOException => println(s"IOException processing file ${outFile.getName}")
     }
+  }
+
+  def writeDocumentTags(doc: Document, outFile: File, fmtr: DocFormatter = BarSepDocFormatter): Unit = {
+    writeTags(getDocumentTags(doc), outFile, fmtr)
   }
 
 }

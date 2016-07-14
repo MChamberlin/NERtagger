@@ -8,7 +8,7 @@ import util._
 import scala.collection.mutable.{HashMap, HashSet}
 
 
-class Tagger(trainingCorpus: TaggedCorpus = GeneTrainingCorpus,
+class Tagger(trainingCorpus: TaggedCorpus,
              rareThreshold: Int = 5,
              maxNGramSize: Int = 3,
              preprocessor: Preprocessor = PatternPreprocessor) {

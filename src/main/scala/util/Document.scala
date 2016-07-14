@@ -9,7 +9,7 @@ abstract class Document {
 
 object GeneDev extends Document {
   val filename = "genetag.dev.txt"
-  val source = Source.fromInputStream(getClass.getResourceAsStream(filename))
+  val source = Source.fromURL(ClassLoader.getSystemResource(filename))
 
   def getSentIter: SentIter = {
     for (line <- source.reset().getLines() if line.trim.nonEmpty)

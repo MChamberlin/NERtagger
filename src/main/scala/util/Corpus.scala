@@ -2,8 +2,6 @@ package util
 
 import java.io.{IOException, FileNotFoundException}
 
-import util.GeneTrainingCorpus._
-
 import scala.io.Source
 import scala.util.matching.Regex
 import scala.collection.mutable.HashSet
@@ -14,11 +12,10 @@ abstract class TaggedCorpus {
   def getSentIter: TaggedSentIter
 }
 
-class BarSepTagCorpus extends TaggedCorpus {
-  val posSymbSet = HashSet("I-GENE")
-  val filename = "genetag.train.txt"
+abstract class BarSepTagCorpus extends TaggedCorpus {
   val pattern = new Regex("""([^\s\|]+)\|([^\s\|]+)""", "word", "symb")
-  val source = Source.fromFile(filename)
+  val filename: String
+  val source: Source
 
   // TODO: wrap in try/catch block or figure out how to deal with `source`
   def getSentIter: TaggedSentIter = {
@@ -27,12 +24,16 @@ class BarSepTagCorpus extends TaggedCorpus {
   }
 }
 
-object GeneTrainingCorpus extends BarSepTagCorpus {
-  override val filename = "genetag.train.txt"
-  override val source = Source.fromInputStream(getClass.getResourceAsStream(filename))
+abstract class GeneCorpus extends BarSepTagCorpus {
+  val posSymbSet = HashSet("I-GENE")
 }
 
-object GeneKey extends BarSepTagCorpus {
+object GeneTrainingCorpus extends GeneCorpus {
+  override val filename = "genetag.train.txt"
+  override val source = Source.fromURL(ClassLoader.getSystemResource(filename))
+}
+
+object GeneKey extends GeneCorpus {
   override val filename = "genetag.key.txt"
-  override val source = Source.fromInputStream(getClass.getResourceAsStream(filename))
+  override val source = Source.fromURL(ClassLoader.getSystemResource(filename))
 }

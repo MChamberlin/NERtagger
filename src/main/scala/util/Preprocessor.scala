@@ -2,7 +2,6 @@ package util
 
 import scala.util.matching.Regex
 
-
 abstract class Preprocessor {
   def transform(word: String): String
 }
@@ -18,7 +17,11 @@ object PatternPreprocessor extends Preprocessor {
   }
 
   protected def transformSubstring(str: String): String = {
-    str.replaceAll("[A-Z]+","X").replaceAll("[a-z]+","x").replaceAll("[0-9]+","d").distinct.sorted
+    str.replaceAll("[A-Z]+","X").
+      replaceAll("[a-z]+","x").
+      replaceAll("[0-9]+","d").
+      replaceAll("""[^\x00-\x7F]""", "x").
+      distinct.sorted
   }
 
 }

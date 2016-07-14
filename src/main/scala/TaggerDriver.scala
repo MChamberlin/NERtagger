@@ -20,9 +20,9 @@ object TaggerDriver extends App {
 
     opt[File]('o', "out").required().valueName("<file>").
       action( (x, c) => c.copy(outFile = x) ).
-//      validate( x =>
-//        if (x.canWrite) success
-//        else failure(s"${x.getPath} is not writeable")).
+      validate( x =>
+        if (x.canWrite) success
+        else failure(s"${x.getPath} is not writeable")).
       text("output file name")
 
     opt[Int]('r', "rare").optional().valueName("<int>").
@@ -36,11 +36,10 @@ object TaggerDriver extends App {
 
   // parser.parse returns Option[C]
   parser.parse(args, Config()).map { config =>
-    val tagger = new Tagger (
-      config.trainingCorpus,
-      config.rareThreshold,
-      config.maxNGramSize,
-      config.preprocessor)
+    val tagger = new Tagger(config.rareThreshold, config.maxNGramSize, config.preprocessor)
+    println(s"Training tagger...")
+    tagger.train(config.trainingCorpus)
+    println(s"Writing tagged sentences...")
     tagger.writeDocumentTags(config.devDoc, config.outFile)
     println(s"Tagged sentences written to ${config.outFile.getName}")
     val scorer = new TaggerEvaluator(tagger)

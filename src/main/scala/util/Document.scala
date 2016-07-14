@@ -16,3 +16,7 @@ abstract class Document {
 object GeneDev extends Document {
   val filename = "/genetag.dev.txt"
 }
+
+object WikiDev extends Document {
+  val filename = "/wikitag.dev.txt"
+}

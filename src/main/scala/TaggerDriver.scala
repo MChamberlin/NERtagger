@@ -7,12 +7,12 @@ import util._
 object TaggerDriver extends App {
   // TODO: add commands to train, score, and tag separately using train/dev/key args
   case class Config(outFile: File = new File("."),
-                    trainingCorpus: TaggedCorpus = GeneTrainingCorpus,
+                    trainingCorpus: TaggedCorpus = WikiTrainingCorpus,
                     rareThreshold: Int = 5,
                     maxNGramSize: Int = 3,
                     preprocessor: Preprocessor = PatternPreprocessor,
-                    devDoc: Document = GeneDev,
-                    keyDoc: TaggedCorpus = GeneKey
+                    devDoc: Document = WikiDev,
+                    keyDoc: TaggedCorpus = WikiKey
                      )
 
   val parser = new OptionParser[Config]("NERTagger") {

@@ -12,26 +12,43 @@ abstract class TaggedCorpus {
   def getSentIter: TaggedSentIter
 }
 
-abstract class BarSepTagCorpus extends TaggedCorpus {
-  private val pattern = new Regex("""([^\s\|]+)\|([^\s\|]+)""", "word", "symb")
+abstract class PatternCorpus extends TaggedCorpus {
   val filename: String
+  val pattern: Regex
 
   // TODO: wrap in try/catch block or figure out how to deal with `source`
   def getSentIter: TaggedSentIter = {
     val source = Source.fromInputStream(getClass.getResourceAsStream(filename))
     for (line <- source.reset().getLines() if line.trim.nonEmpty)
-      yield pattern.findAllMatchIn(line).map( m => TagTuple(m.group("word"),m.group("symb")) )
+    yield pattern.findAllMatchIn(line).map( m => TagTuple(m.group("word"),m.group("symb")) )
   }
 }
 
-abstract class GeneCorpus extends BarSepTagCorpus {
+
+abstract class GeneCorpus extends PatternCorpus {
+  val pattern = new Regex("""([^\s\|]+)\|([^\s\|]+)""", "word", "symb")
   val posSymbSet = HashSet("I-GENE")
 }
 
-case object GeneTrainingCorpus extends GeneCorpus {
-  override val filename = "/genetag.train.txt"
+object GeneTrainingCorpus extends GeneCorpus {
+  val filename = "/genetag.train.txt"
 }
 
 object GeneKey extends GeneCorpus {
-  override val filename = "/genetag.key.txt"
+  val filename = "/genetag.key.txt"
+}
+
+
+
+abstract class WikiCorpus extends PatternCorpus {
+  val pattern = new Regex("""([^\s\|]+)\|([^\|]+)\|([^\s\|]+)""", "word", "POS", "symb")
+  val posSymbSet = HashSet("I-MISC","I-PER","I-ORG","I-LOC")
+}
+
+object WikiTrainingCorpus extends WikiCorpus {
+  val filename = "/wikitag.train.txt"
+}
+
+object WikiKey extends WikiCorpus {
+  val filename = "/wikitag.key.txt"
 }

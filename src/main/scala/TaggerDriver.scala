@@ -18,14 +18,14 @@ object TaggerDriver extends App {
   val parser = new OptionParser[Config]("NERTagger") {
     head("NER Tagger", "1.0")
 
-    opt[File]('o', "out").required().valueName("<outfile>").
+    opt[File]('o', "out").required().valueName("<file>").
       action( (x, c) => c.copy(outFile = x) ).
-      validate( x =>
-        if (x.canWrite) success
-        else failure(s"${x.getPath} is not writeable")).
+//      validate( x =>
+//        if (x.canWrite) success
+//        else failure(s"${x.getPath} is not writeable")).
       text("output file name")
 
-    opt[Int]('r', "rare").optional().valueName("<rare theshold>").
+    opt[Int]('r', "rare").optional().valueName("<int>").
       action( (x, c) => c.copy(rareThreshold = x) ).
       validate( x =>
       if (x > 0) success

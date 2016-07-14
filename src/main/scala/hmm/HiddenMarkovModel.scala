@@ -106,15 +106,15 @@ class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {
     }
   }
 
-  def load(source: Source): Unit = {
+  def load(ruleDoc: Document): Unit = {
     try {
       wordSet.clear()
       symbSet.clear()
-      source.getLines().foreach(l => parseRule(l))
+      ruleDoc.getLineIter.foreach(l => parseRule(l))
       wordSet ++= emissCounts.keySet.map(x=>x.word).toSet
       symbSet ++= ngramCounts(0).keySet.flatMap(x=>x)
     } catch {
-      case e: IOException => println(s"IOException processing source ${source}")
+      case e: IOException => println(s"IOException processing source ${ruleDoc.filename}")
     }
   }
 

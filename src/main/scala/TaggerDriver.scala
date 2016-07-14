@@ -5,12 +5,12 @@ import tagger.{TaggerEvaluator, Tagger}
 import util._
 
 object TaggerDriver extends App {
-  // TODO: add allow loading of rule counts
   case class Config(outFile: Option[File] = None,
                     docSet: DocSet = WikiDocSet,
                     rareThreshold: Int = 5,
                     maxNGramSize: Int = 3,
                     preprocessor: Preprocessor = PatternPreprocessor,
+                    train: Boolean = false,
                     mode: String = "score",
                     text: String = "")
 
@@ -39,6 +39,10 @@ object TaggerDriver extends App {
         if (x == 3) success
         else failure(s"Only n = 3 supported currently")).
       text("max n-gram size")
+
+    opt[Boolean]('t', "train").optional().valueName("<bool>").
+      action( (x, c) => c.copy(train = x) ).
+      text("whether or not to retrain the model")
 
     opt[String]('p', "pp").optional().valueName("<str>").
       validate( x =>
@@ -83,19 +87,19 @@ object TaggerDriver extends App {
             if (x.canWrite) success
             else failure(s"${x.getPath} is not writeable")).
           text("output file name (optional)")
-//        opt[File]('l', "load").optional().valueName("<file>").
-//          action( (x, c) => c.copy(loadFile = Some(x))).
-//          validate( x =>
-//            if (x.canRead) success
-//            else failure(s"${x.getPath} is not readable")).
-//          text("load file name")
       ).text("Tag sentence using trained model; output to file if provided")
   }
 
   parser.parse(args, Config()).map { config =>
-    val tagger = new Tagger(config.rareThreshold, config.maxNGramSize, config.preprocessor)
-    println("Training tagger...")
-    tagger.train(config.docSet.corpus)
+    val tagger = new Tagger(config.maxNGramSize, config.preprocessor)
+    println(s"Using ${config.docSet.name}")
+    if (config.train) {
+      println("Training tagger...")
+      tagger.train(config.docSet.corpus, config.rareThreshold)
+    } else {
+      println("Loading tagger...")
+      tagger.load(config.docSet.ruleDoc)
+    }
     if (config.mode == "score") {
       if (config.outFile.nonEmpty) {
         println(s"Writing tagged sentences...")

@@ -5,16 +5,20 @@ import java.io._
 import hmm.HiddenMarkovModel
 import util._
 
+import scala.collection.mutable
 import scala.collection.mutable.{HashMap, HashSet}
 
 
-class Tagger(rareThreshold: Int = 5,
-             maxNGramSize: Int = 3,
+class Tagger(maxNGramSize: Int = 3,
              preprocessor: Preprocessor = PatternPreprocessor) {
   val model = new HiddenMarkovModel(maxNGramSize, preprocessor)
 
-  def train(trainingCorpus: TaggedCorpus = GeneTrainingCorpus): Unit = {
+  def train(trainingCorpus: TaggedCorpus, rareThreshold: Int): Unit = {
     model.train(trainingCorpus, rareThreshold)
+  }
+
+  def load(ruleDoc: Document): Unit = {
+    model.load(ruleDoc)
   }
 
   protected def viterbi(tokens: List[String]): List[String] = {

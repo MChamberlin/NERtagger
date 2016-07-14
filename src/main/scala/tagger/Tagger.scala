@@ -8,12 +8,14 @@ import util._
 import scala.collection.mutable.{HashMap, HashSet}
 
 
-class Tagger(trainingCorpus: TaggedCorpus,
-             rareThreshold: Int = 5,
+class Tagger(rareThreshold: Int = 5,
              maxNGramSize: Int = 3,
              preprocessor: Preprocessor = PatternPreprocessor) {
-  protected val model = new HiddenMarkovModel(maxNGramSize, preprocessor)
-  model.train(trainingCorpus, rareThreshold)
+  val model = new HiddenMarkovModel(maxNGramSize, preprocessor)
+
+  def train(trainingCorpus: TaggedCorpus = GeneTrainingCorpus): Unit = {
+    model.train(trainingCorpus, rareThreshold)
+  }
 
   protected def viterbi(tokens: List[String]): List[String] = {
     // TODO: comment; more informative variable names?
@@ -54,7 +56,6 @@ class Tagger(trainingCorpus: TaggedCorpus,
           }
           pi(k)(u)(v) = bestProb
           bp(k)(u)(v) = bestSymb
-          // println(s"pi($k)($u)($v) = $bestProb | $bestSymb")
         }
       }
     }
@@ -95,7 +96,7 @@ class Tagger(trainingCorpus: TaggedCorpus,
     try {
       val writer = new BufferedWriter(new FileWriter(outFile))
       getDocumentTags(doc).foreach{ sentIter =>
-        writer.write(sentIter.map(t => s"${t.word}|${t.word}").mkString(" ") + "\n")
+        writer.write(sentIter.map(t => s"${t.word}|${t.symb}").mkString(" ") + "\n")
       }
       writer.close()
     } catch {

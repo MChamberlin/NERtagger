@@ -1,10 +1,18 @@
 # NER Tagger
 
-A Maximum Entropy Sequence Model for Named Entity Recognition (NER) in Scala
+A Maximum Entropy Sequence Model for [Named Entity Recognition (NER)](https://en.wikipedia.org/wiki/Named-entity_recognition) in Scala
 
-Currently implements a trigram Hidden Markov Model
+Currently implements a trigram [Hidden Markov Model](https://en.wikipedia.org/wiki/Hidden_Markov_model)
 
-Inference is done using the Viterbi algorithm
+Inference is done using the [Viterbi algorithm](https://en.wikipedia.org/wiki/Viterbi_algorithm)
+
+## Build
+
+A fully functional jar, including all dependencies, can be built using [sbt-assembly](https://github.com/sbt/sbt-assembly):
+
+In the project's top level directory, run:
+
+```$ sbt assembly```
 
 ## Usage
 

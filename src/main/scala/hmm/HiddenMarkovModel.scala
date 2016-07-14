@@ -16,10 +16,11 @@ class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {
 
   def train(corpus: TaggedCorpus, rareThreshold: Int = 3) {
     wordSet ++= collectNonRares(corpus.getSentIter, rareThreshold)
-    collectFreqs(corpus.getSentIter)
+    collectCounts(corpus.getSentIter)
+    symbSet ++= ngramCounts(0).keySet.flatMap(x=>x)
   }
 
-  private def collectFreqs(sentences: TaggedSentIter): Unit = {
+  private def collectCounts(sentences: TaggedSentIter): Unit = {
     for (sent <- sentences) {
       val wordTuples = sent.map{t => preprocessTagForRares(t)}.toList
       // update emission and 1-gram counts
@@ -36,7 +37,6 @@ class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {
         }
       }
     }
-    symbSet ++= ngramCounts(0).keySet.flatMap(x=>x)
   }
 
   private def collectNonRares(sentences: TaggedSentIter, rareThreshold: Int): Set[String] = {

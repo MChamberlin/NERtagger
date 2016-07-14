@@ -15,7 +15,7 @@ object TaggerDriver extends App {
                     text: String = "")
 
   val parser = new OptionParser[Config]("NERtagger") {
-    head("NER Tagger", "1.0")
+    head("NERtagger", "1.0")
 
     help("help").text("ouptut usage information")
 

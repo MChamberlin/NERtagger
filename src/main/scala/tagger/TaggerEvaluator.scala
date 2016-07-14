@@ -4,7 +4,6 @@ import util._
 
 
 protected class SymbTypeCounter {
-  // TODO: deal with potential DivideByZero errors
   var truePos: Int = 0
   var trueNeg: Int = 0
   var falsePos: Int = 0
@@ -18,15 +17,18 @@ protected class SymbTypeCounter {
   }
 
   def getPrecision: Double = {
-    truePos / (truePos + falsePos).toDouble
+    val denom = (truePos + falsePos).toDouble
+    if (denom != 0) truePos / denom else 1.0
   }
 
   def getRecall: Double = {
-    truePos / (truePos + falseNeg).toDouble
+    val denom = (truePos + falseNeg).toDouble
+    if (denom != 0) truePos / denom else 1.0
   }
 
   def getAccuracy: Double = {
-    (truePos + trueNeg) / getTotalCounts.toDouble
+    val denom = getTotalCounts.toDouble
+    if (denom != 0) (truePos + trueNeg) / denom else 1.0
   }
 
   def getF1Score: Double = {

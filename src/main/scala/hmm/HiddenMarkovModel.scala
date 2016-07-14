@@ -5,7 +5,6 @@ import java.io._
 import util._
 
 import scala.collection.mutable.{HashMap, HashSet}
-import scala.io.Source
 
 
 class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {

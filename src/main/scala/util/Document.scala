@@ -3,8 +3,7 @@ package util
 import scala.io.Source
 
 
-abstract class Document {
-  val filename: String
+case class Document(filename: String) {
 
   def getLineIter: Iterator[String] = {
     val source = Source.fromInputStream(getClass.getResourceAsStream(filename))
@@ -16,20 +15,4 @@ abstract class Document {
     for (line <- getLineIter)
       yield line.split(" ").toIterator
   }
-}
-
-object GeneDev extends Document {
-  val filename = "/genetag.dev.txt"
-}
-
-object GeneRules extends Document {
-  val filename = "/genetag.rules.txt"
-}
-
-object WikiDev extends Document {
-  val filename = "/wikitag.dev.txt"
-}
-
-object WikiRules extends Document {
-  val filename = "/wikitag.rules.txt"
 }

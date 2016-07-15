@@ -89,14 +89,17 @@ object TaggerDriver extends App {
   }
 
   parser.parse(args, Config()).map { config =>
-    val tagger = new Tagger(config.preprocessor)
     println(s"Using ${config.docSet.name}")
-    if (config.train) {
+    val tagger: Tagger = if (config.train) {
+      val tagger = new Tagger(config.preprocessor)
       println("Training tagger...")
       tagger.train(config.docSet.corpus, config.rareThreshold)
+      tagger
     } else {
+      val tagger = new Tagger(config.docSet.preprocessor)
       println("Loading tagger...")
       tagger.load(config.docSet.ruleDoc)
+      tagger
     }
     if (config.mode == "score") {
       if (config.outFile.nonEmpty) {

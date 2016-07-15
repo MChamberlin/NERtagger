@@ -7,6 +7,7 @@ abstract class DocSet {
   val corpus: TaggedCorpus
   val keyDoc: TaggedCorpus
   val devDoc: Document
+  val preprocessor: Preprocessor
 }
 
 case object WikiDocSet extends DocSet {
@@ -15,6 +16,7 @@ case object WikiDocSet extends DocSet {
   val keyDoc = WikiCorpus("/wikitag.key.txt")
   val devDoc = Document("/wikitag.dev.txt")
   val ruleDoc = Document("/wikitag.rules.txt")
+  val preprocessor = PatternPreprocessor
 }
 
 case object GeneDocSet extends DocSet {
@@ -23,4 +25,5 @@ case object GeneDocSet extends DocSet {
   val keyDoc = GeneCorpus("/genetag.key.txt")
   val devDoc = Document("/genetag.dev.txt")
   val ruleDoc = Document("/genetag.rules.txt")
+  val preprocessor = ReplacePreprocessor
 }

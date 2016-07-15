@@ -35,9 +35,11 @@ object ClassifyPreprocessor extends Preprocessor {
     if ("[0-9]".r.findFirstIn(word).nonEmpty) {
       "<NUMERIC>"
     } else if ("^[A-Z]+$".r.findFirstIn(word).nonEmpty) {
-      "<ALL_CAP>"
+      "<ALLCAP>"
+    } else if ("[A-Z]$".r.findFirstIn(word).nonEmpty) {
+      "<LASTCAP>"
     } else if ("^[A-Z]".r.findFirstIn(word).nonEmpty) {
-      "<FIRST_CAP>"
+      "<FIRSTCAP>"
     } else {
       "<RARE>"
     }

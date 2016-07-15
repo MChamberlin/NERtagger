@@ -25,5 +25,5 @@ case object GeneDocSet extends DocSet {
   val keyDoc = GeneCorpus("/genetag.key.txt")
   val devDoc = Document("/genetag.dev.txt")
   val ruleDoc = Document("/genetag.rules.txt")
-  val preprocessor = ReplacePreprocessor
+  val preprocessor = ClassifyPreprocessor
 }

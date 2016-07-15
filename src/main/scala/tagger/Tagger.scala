@@ -30,7 +30,7 @@ class Tagger(preprocessor: Preprocessor = PatternPreprocessor) {
     * @param tokens a list of word strings
     * @return a list of symbol tag strings
     */
-  protected def viterbi(tokens: List[String]): List[String] = {
+  protected def getSymbols(tokens: List[String]): List[String] = {
     // TODO: comment; more informative variable names?
     // initialize probabilities and back-pointer maps
     val bp = HashMap.empty[Int,HashMap[String,HashMap[String,String]]]
@@ -101,7 +101,7 @@ class Tagger(preprocessor: Preprocessor = PatternPreprocessor) {
    * @return Iterator of TagTuples with inferred symbols
    */
   def getSentenceTags(tokens: List[String]): TagIter = {
-    viterbi(tokens).zip(tokens).map{case (symb, word) => new TagTuple(word,symb)}.toIterator
+    getSymbols(tokens).zip(tokens).map{case (symb, word) => new TagTuple(word,symb)}.toIterator
   }
 
   /** Returns iterator of tagged sentences for provided document

@@ -35,13 +35,6 @@ object TaggerDriver extends App {
         else failure(s"Rare theshold $x must be > 0")).
       text("rare count threshold")
 
-    opt[Int]('n',"ngram").optional().valueName("<int>").
-      action( (x, c) => c.copy(maxNGramSize = x) ).
-      validate( x =>
-        if (x == 3) success
-        else failure(s"Only n = 3 supported currently")).
-      text("max n-gram size")
-
     opt[Boolean]('t', "train").optional().valueName("<bool>").
       action( (x, c) => c.copy(train = x) ).
       text("whether or not to retrain the model")
@@ -96,7 +89,7 @@ object TaggerDriver extends App {
   }
 
   parser.parse(args, Config()).map { config =>
-    val tagger = new Tagger(config.maxNGramSize, config.preprocessor)
+    val tagger = new Tagger(config.preprocessor)
     println(s"Using ${config.docSet.name}")
     if (config.train) {
       println("Training tagger...")

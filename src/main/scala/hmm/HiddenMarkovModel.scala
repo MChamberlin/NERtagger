@@ -7,8 +7,9 @@ import util._
 import scala.collection.mutable.{HashMap, HashSet}
 
 
-class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {
-  val ngramCounts = Array.fill(n)(HashMap[List[String], Int]().withDefaultValue(0))
+class HiddenMarkovModel(pp: Preprocessor = PatternPreprocessor) {
+  val ngramSize = 3 // Currently only transition probabilities using trigrams are supported
+  val ngramCounts = Array.fill(ngramSize)(HashMap[List[String], Int]().withDefaultValue(0))
   val emissCounts = HashMap[TagTuple, Int]().withDefaultValue(0)
   val wordSet = new HashSet[String]()
   val symbSet = new HashSet[String]()
@@ -28,9 +29,9 @@ class HiddenMarkovModel(n: Int = 3, pp: Preprocessor = PatternPreprocessor) {
         ngramCounts(0)(List(tuple.symb)) += 1
       }
       // prepend tuple list with n-1 START symbols and append STOP symbol
-      val fullTuples = List.fill(n-1)(TagTuple("","*>")) ++ wordTuples ++ List(TagTuple("", "<*"))
+      val fullTuples = List.fill(ngramSize-1)(TagTuple("","*>")) ++ wordTuples ++ List(TagTuple("", "<*"))
       // get n-grams over tuple list and increment n-gram tag counts
-      for (i <- 2 to n) {
+      for (i <- 2 to ngramSize) {
         fullTuples.sliding(i).map(x => x.toList).foreach { ngram =>
           ngramCounts(i-1)(ngram.map(t => t.symb)) += 1
         }

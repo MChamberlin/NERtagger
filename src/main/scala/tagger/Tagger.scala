@@ -8,10 +8,12 @@ import util._
 import scala.collection.mutable
 import scala.collection.mutable.{HashMap, HashSet}
 
-
-class Tagger(maxNGramSize: Int = 3,
-             preprocessor: Preprocessor = PatternPreprocessor) {
-  val model = new HiddenMarkovModel(maxNGramSize, preprocessor)
+/** Class for tagging named entities in sentences and documents using Hidden Markov Model
+ *
+ * @param preprocessor rare word preprocessor
+ */
+class Tagger(preprocessor: Preprocessor = PatternPreprocessor) {
+  val model = new HiddenMarkovModel(preprocessor)
 
   def train(trainingCorpus: TaggedCorpus, rareThreshold: Int): Unit = {
     model.train(trainingCorpus, rareThreshold)
@@ -21,6 +23,13 @@ class Tagger(maxNGramSize: Int = 3,
     model.load(ruleDoc)
   }
 
+  /** Returns inferred symbol tags for provided sentence tokens
+    *
+    * Performs inference using the Viterbi algorithm
+    *
+    * @param tokens a list of word strings
+    * @return a list of symbol tag strings
+    */
   protected def viterbi(tokens: List[String]): List[String] = {
     // TODO: comment; more informative variable names?
     // initialize probabilities and back-pointer maps
@@ -86,29 +95,46 @@ class Tagger(maxNGramSize: Int = 3,
     tags.toList.drop(1)
   }
 
-  def getSentenceTags(sent: List[String]): TagIter = {
-    viterbi(sent).zip(sent).map{case (symb, word) => new TagTuple(word,symb)}.toIterator
+  /** Returns word/symbol TagTuple iterator for provided sentence tokens
+   *
+   * @param tokens A list of word strings
+   * @return Iterator of TagTuples with inferred symbols
+   */
+  def getSentenceTags(tokens: List[String]): TagIter = {
+    viterbi(tokens).zip(tokens).map{case (symb, word) => new TagTuple(word,symb)}.toIterator
   }
 
+  /** Returns iterator of tagged sentences for provided document
+    *
+    * @param doc document with iterator of sentences to tag
+    * @return iterator of tagged sentences with inferred symbols
+    */
   def getDocumentTags(doc: Document): TaggedSentIter = {
     for (sent <- doc.getSentIter)
       yield getSentenceTags(sent.toList)
   }
 
-  def writeTags(sentIter: TaggedSentIter, outFile: File, fmtr: DocFormatter = BarSepDocFormatter): Unit = {
+  /** Writes tagged sentences to provided file
+    *
+    * Tags sentences and writes them to output file using
+    * DocFormatter to transform tagged sentence iterator into strings
+    *
+    * @param sentIter
+    * @param outFile
+    * @param formatter
+    */
+  def writeTags(sentIter: TaggedSentIter, outFile: File, formatter: DocFormatter = BarSepDocFormatter): Unit = {
     try {
       val writer = new BufferedWriter(new FileWriter(outFile))
-      sentIter.foreach{ tagIter =>
-        writer.write(fmtr.formatSentenceTags(tagIter))
-      }
+      sentIter.foreach( tagIter => writer.write(formatter.formatSentenceTags(tagIter)) )
       writer.close()
     } catch {
       case e: IOException => println(s"IOException processing file ${outFile.getName}")
     }
   }
 
-  def writeDocumentTags(doc: Document, outFile: File, fmtr: DocFormatter = BarSepDocFormatter): Unit = {
-    writeTags(getDocumentTags(doc), outFile, fmtr)
+  def writeDocumentTags(doc: Document, outFile: File, formatter: DocFormatter = BarSepDocFormatter): Unit = {
+    writeTags(getDocumentTags(doc), outFile, formatter)
   }
 
 }

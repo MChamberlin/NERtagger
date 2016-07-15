@@ -4,6 +4,9 @@ import scopt.OptionParser
 import tagger.{TaggerEvaluator, Tagger}
 import util._
 
+/**
+ * Main application driver providing access to the NER tagger from the command line
+ */
 object TaggerDriver extends App {
   case class Config(outFile: Option[File] = None,
                     docSet: DocSet = WikiDocSet,
@@ -110,7 +113,7 @@ object TaggerDriver extends App {
       val scorer = new TaggerEvaluator(tagger)
       scorer.score(config.docSet.devDoc, config.docSet.keyDoc)
     } else if (config.mode == "save") {
-      tagger.model.save(config.outFile.get)
+      tagger.save(config.outFile.get)
     } else if (config.mode == "tag") {
       val tags = tagger.getSentenceTags(config.text.split(" ").toList)
       if (config.outFile.nonEmpty) {

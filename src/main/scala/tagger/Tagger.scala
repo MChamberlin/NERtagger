@@ -15,12 +15,29 @@ import scala.collection.mutable.{HashMap, HashSet}
 class Tagger(preprocessor: Preprocessor = PatternPreprocessor) {
   val model = new HiddenMarkovModel(preprocessor)
 
+  /** Trains underlying HMM using provided corpus and rare word threshold
+   *
+   * @param trainingCorpus Corpus with tagged sentences to train on
+   * @param rareThreshold max word frequency in corpus for rare preprocessing
+   */
   def train(trainingCorpus: TaggedCorpus, rareThreshold: Int): Unit = {
     model.train(trainingCorpus, rareThreshold)
   }
 
+  /** Loads underlying HMM with rules from provided rule Document
+   *
+   * @param ruleDoc Document containing transition/emission rule frequencies
+   */
   def load(ruleDoc: Document): Unit = {
     model.load(ruleDoc)
+  }
+
+  /** Saves underlying HMM model to provided file as series of rule frequencies
+    *
+    * @param file File object to write rules to
+    */
+  def save(file: File): Unit = {
+    model.save(file)
   }
 
   /** Returns inferred symbol tags for provided sentence tokens
@@ -133,6 +150,15 @@ class Tagger(preprocessor: Preprocessor = PatternPreprocessor) {
     }
   }
 
+  /** Writes tagged sentences from provided Document to output File
+    *
+    * Tags sentences from provided Document object and writes them to outFile
+    * using DocFormatter to transform tagged sentence iterator into strings
+    *
+    * @param doc
+    * @param outFile
+    * @param formatter
+    */
   def writeDocumentTags(doc: Document, outFile: File, formatter: DocFormatter = BarSepDocFormatter): Unit = {
     writeTags(getDocumentTags(doc), outFile, formatter)
   }

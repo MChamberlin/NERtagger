@@ -35,9 +35,8 @@ object TaggerDriver extends App {
         else failure(s"Rare theshold $x must be > 0")).
       text("rare count threshold")
 
-    opt[Boolean]('t', "train").optional().valueName("<bool>").
-      action( (x, c) => c.copy(train = x) ).
-      text("whether or not to retrain the model")
+    opt[Unit]('t', "train").optional().action( (_, c) => c.copy(train = true) ).
+      text("flag indicating whether or not to retrain the model")
 
     opt[String]('p', "pp").optional().valueName("<str>").
       validate( x =>

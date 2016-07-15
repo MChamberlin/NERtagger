@@ -42,7 +42,26 @@ $ java -jar NERtagger.jar --help
     -o, --out <file>         output file name (optional)
 ```
 
-## Example
+## Example Usage
+
+### Scoring
+
+```
+$ java -jar NERtagger.jar score -c wiki
+
+  Using Wikipedia Documents
+  Loading tagger...
+  Scoring tagger...
+
+  Total Scores
+  ------------------
+  Accuracy  | 0.9627
+  Precision | 0.9377
+  Recall    | 0.7916
+  F1-Score  | 0.8585
+```
+
+### Tagging
 
 ```sh
 $ java -jar NERtagger.jar tag 'Matthew Chamberlin lives in San Francisco , but his code lives on GitHub .'

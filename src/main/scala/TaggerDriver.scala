@@ -93,7 +93,8 @@ object TaggerDriver extends App {
             else failure(s"${x.getPath} is not writeable")).
           text("output file name (optional)"),
         checkConfig( c =>
-          if (c.inFile.nonEmpty && c.text.nonEmpty) failure("Must provide either text or input file, not both")
+          if (c.inFile.isEmpty && c.text.isEmpty) failure("must provide either text or input file")
+          else if (c.inFile.nonEmpty && c.text.nonEmpty) failure("must provide either text or input file, but not both")
           //else if (c.inFile.nonEmpty && c.outFile.isEmpty) failure("Must provide output file when tagging input file")
           else success )
       ).text("Tag sentence using trained model; output to file if provided")

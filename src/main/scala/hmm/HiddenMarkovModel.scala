@@ -133,7 +133,7 @@ class HiddenMarkovModel(pp: Preprocessor = PatternPreprocessor) {
     *
     * @param ruleDoc Document containing transition/emission rule frequencies
     */
-  def load(ruleDoc: Document): Unit = {
+  def load(ruleDoc: ResourceDocument): Unit = {
     try {
       wordSet.clear()
       symbSet.clear()

@@ -9,6 +9,7 @@ import util._
  */
 object TaggerDriver extends App {
   case class Config(outFile: Option[File] = None,
+                    inFile: Option[File] = None,
                     docSet: DocSet = WikiDocSet,
                     rareThreshold: Int = 5,
                     maxNGramSize: Int = 3,
@@ -71,22 +72,30 @@ object TaggerDriver extends App {
           text("output file name")
       ).text("Saves model rule counts to file for quicker loading")
 
-    // TODO: add ability to tag entire input document
-    // TODO: check config status for either input doc or text
     cmd("tag").action( (_, c) => c.copy(mode = "tag") ).
       children(
-        arg[String]("<text>").required().
+        arg[String]("<text>").optional().
           action( (x, c) => c.copy(text = x)).
           validate( x =>
             if (x.nonEmpty) success
             else failure("<text> must be non-empty")
           ).text("text to tag"),
+        opt[File]('i', "input").optional().valueName("<file>").
+          action( (x, c) => c.copy(inFile = Some(x)) ).
+          validate( x =>
+            if (x.canRead) success
+            else failure(s"${x.getPath} is not readable")).
+          text("input file name"),
         opt[File]('o', "out").optional().valueName("<file>").
           action( (x, c) => c.copy(outFile = Some(x)) ).
           validate( x =>
             if (x.canWrite) success
             else failure(s"${x.getPath} is not writeable")).
-          text("output file name (optional)")
+          text("output file name (optional)"),
+        checkConfig( c =>
+          if (c.inFile.nonEmpty && c.text.nonEmpty) failure("Must provide either text or input file, not both")
+          //else if (c.inFile.nonEmpty && c.outFile.isEmpty) failure("Must provide output file when tagging input file")
+          else success )
       ).text("Tag sentence using trained model; output to file if provided")
   }
 
@@ -115,11 +124,16 @@ object TaggerDriver extends App {
     } else if (config.mode == "save") {
       tagger.save(config.outFile.get)
     } else if (config.mode == "tag") {
-      val tags = tagger.getSentenceTags(config.text.split(" ").toList)
-      if (config.outFile.nonEmpty) {
-        tagger.writeTags(Iterator(tags), config.outFile.get)
+      val tags: TaggedSentIter = if (config.inFile.nonEmpty) {
+        tagger.getDocumentTags(SpaceSepDocument(config.inFile.get))
       } else {
-        print("\nOutput:\n" + BarSepDocFormatter.formatSentenceTags(tags))
+        tagger.getTextTags(config.text)
+      }
+      if (config.outFile.nonEmpty) {
+        tagger.writeTags(tags, config.outFile.get)
+      } else {
+        print("\nOutput:\n")
+        BarSepDocFormatter.formatDocumentTags(tags).foreach(x => println(x))
       }
     }
   } getOrElse {

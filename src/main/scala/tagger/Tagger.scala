@@ -28,7 +28,7 @@ class Tagger(preprocessor: Preprocessor = PatternPreprocessor) {
    *
    * @param ruleDoc Document containing transition/emission rule frequencies
    */
-  def load(ruleDoc: Document): Unit = {
+  def load(ruleDoc: ResourceDocument): Unit = {
     model.load(ruleDoc)
   }
 
@@ -129,6 +129,18 @@ class Tagger(preprocessor: Preprocessor = PatternPreprocessor) {
   def getDocumentTags(doc: Document): TaggedSentIter = {
     for (sent <- doc.getSentIter)
       yield getSentenceTags(sent.toList)
+  }
+
+  /** Returns iterator of tagged sentences for provided text
+    *
+    * Assumes sentences are newline-separated and words are space-separated
+    *
+    * @param text intput text to tag
+    * @return iterator of tagged sentences with inferred symbols
+    */
+  def getTextTags(text: String): TaggedSentIter = {
+    for (sent <- text.split("\n").toIterator if sent.trim.nonEmpty)
+      yield getSentenceTags(sent.split(" ").toList)
   }
 
   /** Writes tagged sentences to provided file

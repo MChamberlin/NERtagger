@@ -32,7 +32,8 @@ protected class SymbTypeCounter {
   }
 
   def getF1Score: Double = {
-    (2 * getPrecision * getRecall) / (getPrecision + getRecall)
+    val denom = getPrecision * getRecall
+    if (denom != 0) (2 * denom) / denom else 0.0
   }
 
   def getTotalCounts: Int = {

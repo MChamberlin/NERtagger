@@ -48,8 +48,7 @@ class Tagger(preprocessor: Preprocessor = PatternPreprocessor) {
     * @return a list of symbol tag strings
     */
   protected def getSymbols(tokens: List[String]): List[String] = {
-    // TODO: comment; more informative variable names?
-    // initialize probabilities and back-pointer maps
+    // initialize probability and back-pointer maps
     val bp = HashMap.empty[Int,HashMap[String,HashMap[String,String]]]
     val pi = HashMap.empty[Int,HashMap[String,HashMap[String,Double]]]
     pi(0) = HashMap("*>"->HashMap("*>"->1.0))
@@ -62,20 +61,21 @@ class Tagger(preprocessor: Preprocessor = PatternPreprocessor) {
 
     val n = tokens.length
 
+    // fill probability and back-pointer maps
     var q = -1.0 // trans probability -> P(tag2 | tag0, tag1)
     var e = -1.0 // emiss probability -> P(word | tag2)
     var p = -1.0 // total probability
-    for (k <- 1 to n) {
+    for (k <- 1 to n) { // curr index
       val word = tokens(k-1)
       pi(k) = HashMap.empty[String,HashMap[String,Double]]
       bp(k) = HashMap.empty[String,HashMap[String,String]]
-      ss(k-1).foreach { u =>
+      ss(k-1).foreach { u => // prev symbol
         pi(k)(u) = HashMap.empty[String,Double]
         bp(k)(u) = HashMap.empty[String,String]
-        ss(k).foreach { v =>
+        ss(k).foreach { v => // curr symbol
           var bestProb = -1.0
           var bestSymb = ""
-          ss(k-2).foreach { w =>
+          ss(k-2).foreach { w => // 2nd-prev symbol
             q = model.getTransProb(List(w,u,v))
             e = model.getEmissProb(word, v)
             p = pi(k-1)(w)(u) * q * e
@@ -84,12 +84,13 @@ class Tagger(preprocessor: Preprocessor = PatternPreprocessor) {
               bestSymb = w
             }
           }
-          pi(k)(u)(v) = bestProb
-          bp(k)(u)(v) = bestSymb
+          pi(k)(u)(v) = bestProb // max probability over trigrams & emission
+          bp(k)(u)(v) = bestSymb // best 2nd-prev symbol
         }
       }
     }
-    val tags = Array.fill(n+1)("")
+    // find best prob/symb for last two words, given stop symbol
+    val tags = Array.fill(n+1)("") // use length n+1 to keep indices nice
     var bestProb = -1.0
     var bestU = ""
     var bestV = ""
@@ -106,10 +107,11 @@ class Tagger(preprocessor: Preprocessor = PatternPreprocessor) {
     }
     tags(n-1) = bestU
     tags(n)   = bestV
+    // back-trace through words to find best symbols for each
     for (k <- n-2 to 0 by -1) {
       tags(k) = bp(k+2)(tags(k+1))(tags(k+2))
     }
-    tags.toList.drop(1)
+    tags.toList.drop(1) // drop unused first index
   }
 
   /** Returns word/symbol TagTuple iterator for provided sentence tokens

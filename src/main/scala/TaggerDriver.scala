@@ -91,13 +91,16 @@ object TaggerDriver extends App {
           validate( x =>
             if (x.canWrite) success
             else failure(s"${x.getPath} is not writeable")).
-          text("output file name (optional)"),
-        checkConfig( c =>
-          if (c.inFile.isEmpty && c.text.isEmpty) failure("must provide either text or input file")
-          else if (c.inFile.nonEmpty && c.text.nonEmpty) failure("must provide either text or input file, but not both")
-          //else if (c.inFile.nonEmpty && c.outFile.isEmpty) failure("Must provide output file when tagging input file")
-          else success )
+          text("output file name (optional)")
       ).text("Tag sentence using trained model; output to file if provided")
+
+    checkConfig( c =>
+      if (c.mode == "tag") {
+        if (c.inFile.isEmpty && c.text.isEmpty) failure("must provide either text or input file")
+        else if (c.inFile.nonEmpty && c.text.nonEmpty) failure("must provide either text or input file, but not both")
+        //else if (c.inFile.nonEmpty && c.outFile.isEmpty) failure("Must provide output file when tagging input file")
+        else success }
+      else success )
   }
 
   parser.parse(args, Config()).map { config =>

@@ -12,8 +12,8 @@ import scala.collection.mutable.{HashMap, HashSet}
  *
  * @param preprocessor rare word preprocessor
  */
-class Tagger(preprocessor: Preprocessor = PatternPreprocessor) {
-  val model = new HiddenMarkovModel(preprocessor)
+class Tagger(preprocessor: Preprocessor = PatternPreprocessor, prior: Double, posSymbSet: HashSet[String]) {
+  val model = new HiddenMarkovModel(preprocessor, prior, posSymbSet)
 
   /** Trains underlying HMM using provided corpus and rare word threshold
    *

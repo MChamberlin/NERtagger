@@ -16,7 +16,8 @@ object TaggerDriver extends App {
                     preprocessor: Preprocessor = PatternPreprocessor,
                     train: Boolean = false,
                     mode: String = "score",
-                    text: String = "")
+                    text: String = "",
+                    prior: Double = 0.5 )
 
   val parser = new OptionParser[Config]("NERtagger") {
     head("NERtagger", "1.0")
@@ -41,6 +42,11 @@ object TaggerDriver extends App {
 
     opt[Unit]('t', "train").optional().action( (_, c) => c.copy(train = true) ).
       text("flag indicating whether or not to retrain the model")
+
+    opt[Double]("prior").optional().action( (x, c) => c.copy(prior = x) ).
+      validate( x =>
+        if (1.0 > x && x > 0) success
+        else failure(s"Rare theshold $x must be > 0"))
 
     opt[String]('p', "pp").optional().valueName("<str>").
       validate( x =>
@@ -106,12 +112,12 @@ object TaggerDriver extends App {
   parser.parse(args, Config()).map { config =>
     println(s"Using ${config.docSet.name}")
     val tagger: Tagger = if (config.train) {
-      val tagger = new Tagger(config.preprocessor)
+      val tagger = new Tagger(config.preprocessor, config.prior, config.docSet.keyDoc.posSymbSet)
       println("Training tagger...")
       tagger.train(config.docSet.corpus, config.rareThreshold)
       tagger
     } else {
-      val tagger = new Tagger(config.docSet.preprocessor)
+      val tagger = new Tagger(config.docSet.preprocessor, config.prior, config.docSet.keyDoc.posSymbSet)
       println("Loading tagger...")
       tagger.load(config.docSet.ruleDoc)
       tagger

@@ -4,7 +4,7 @@ import java.io._
 
 import util._
 
-import scala.collection.mutable.{HashMap, HashSet}
+import scala.collection.mutable.{HashSet, HashMap}
 
 /** Tri-gram Hidden Markov Model
   *
@@ -13,7 +13,7 @@ import scala.collection.mutable.{HashMap, HashSet}
   *
   * @param pp Preprocessor used to transform rare words
   */
-class HiddenMarkovModel(pp: Preprocessor = PatternPreprocessor) {
+class HiddenMarkovModel(pp: Preprocessor = PatternPreprocessor, prior: Double = 0.5, posSymbSet: HashSet[String]) {
   val ngramSize = 3 // Currently only transition probabilities using trigrams are supported
   val ngramCounts = Array.fill(ngramSize)(HashMap[List[String], Int]().withDefaultValue(0))
   val emissCounts = HashMap[TagTuple, Int]().withDefaultValue(0)
@@ -103,10 +103,10 @@ class HiddenMarkovModel(pp: Preprocessor = PatternPreprocessor) {
     * @return transition probability in interval [0,1]
     */
   def getTransProb(symbList: List[String]): Double = {
-    // TODO: use weighted probabilities for n-grams up to n
-    val tgramCount = ngramCounts(2)(symbList.take(3))
-    val bgramCount = ngramCounts(1)(symbList.take(2))
-    tgramCount.toDouble / bgramCount
+    val weight = if (posSymbSet(symbList.take(1)(0))) prior else 1.0 - prior
+    val tgramCount = ngramCounts(2)(symbList.takeRight(3))
+    val bgramCount = ngramCounts(1)(symbList.takeRight(2))
+    weight * (tgramCount.toDouble / bgramCount)
   }
 
   /** Saves model to provided file as series of transition / emission rule frequencies
@@ -146,7 +146,7 @@ class HiddenMarkovModel(pp: Preprocessor = PatternPreprocessor) {
   }
 
   // LOAD HELPER METHODS
-  // TODO: push rule file logic into seperate class similar to Corpus
+  // TODO: push rule file logic into separate class similar to Corpus
 
   private def parseNGramRule(args: List[String]): Unit = {
     val (count, ngram) = args.splitAt(1)
